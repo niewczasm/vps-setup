@@ -35,6 +35,10 @@ fi
 log "Performing system update..."
 apt update && apt upgrade -y
 
+# Install essential packages
+log "Installing essential packages..."
+apt install -y curl wget git build-essential
+
 # 2. Create user named michau
 log "Creating user 'michau'..."
 if id "michau" &>/dev/null; then
@@ -75,7 +79,7 @@ fi
 # 6. Install NVM as michau user
 log "Installing NVM as michau user..."
 sudo -u michau bash -c '
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
     echo "NVM installation completed"
 '
 
@@ -104,6 +108,74 @@ sudo -u michau bash -c '
     
     npm install -g @anthropic-ai/claude-code
     echo "Claude Code CLI installed successfully"
+'
+
+# 8.1. Install MCP servers
+log "Installing MCP servers..."
+
+# Install Python and pip for Python-based MCP servers
+apt install -y python3 python3-pip python3-venv
+
+# Install MCP servers as michau user
+sudo -u michau bash -c '
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    
+    # Create directory for MCP servers
+    mkdir -p ~/.local/share/mcp-servers
+    cd ~/.local/share/mcp-servers
+    
+    # Install Sequential Thinking MCP server
+    log "Installing Sequential Thinking MCP server..."
+    npm install -g @modelcontextprotocol/server-sequential-thinking
+    
+    # Install Playwright MCP server (requires additional setup)
+    log "Installing Playwright MCP server..."
+    npm install -g @modelcontextprotocol/server-playwright
+    
+    # Install Playwright browsers
+    npx playwright install
+    
+    # Install Web Fetching MCP server
+    log "Installing Web Fetching MCP server..."
+    npm install -g @modelcontextprotocol/server-fetch
+    
+    # Install Browser Tools MCP server (Python-based)
+    log "Installing Browser Tools MCP server..."
+    python3 -m pip install --user mcp-server-browser-tools
+    
+    echo "MCP servers installed successfully"
+'
+
+# Create MCP configuration for Claude Code
+log "Creating MCP configuration for Claude Code..."
+sudo -u michau bash -c '
+    mkdir -p ~/.config/claude-code
+    
+    cat > ~/.config/claude-code/mcp.json << EOF
+{
+  "mcpServers": {
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-playwright"]
+    },
+    "fetch": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-fetch"]
+    },
+    "browser-tools": {
+      "command": "python3",
+      "args": ["-m", "mcp_server_browser_tools"]
+    }
+  }
+}
+EOF
+    
+    echo "MCP configuration created at ~/.config/claude-code/mcp.json"
 '
 
 # 9. Add claudeca alias for michau
@@ -167,6 +239,20 @@ sudo -u michau bash -c '
     echo "Node version: $(node --version)"
     echo "NPM version: $(npm --version)"
     echo "Claude Code installed: $(which claude || echo \"Not found in PATH\")"
+    echo ""
+    echo "MCP Servers verification:"
+    echo "- Sequential Thinking: $(npm list -g @modelcontextprotocol/server-sequential-thinking 2>/dev/null | grep server-sequential-thinking || echo \"Not found\")"
+    echo "- Playwright: $(npm list -g @modelcontextprotocol/server-playwright 2>/dev/null | grep server-playwright || echo \"Not found\")"
+    echo "- Web Fetching: $(npm list -g @modelcontextprotocol/server-fetch 2>/dev/null | grep server-fetch || echo \"Not found\")"
+    echo "- Browser Tools: $(python3 -m pip show mcp-server-browser-tools 2>/dev/null | grep Name || echo \"Not found\")"
+    echo ""
+    echo "MCP Config file:"
+    if [ -f ~/.config/claude-code/mcp.json ]; then
+        echo "✓ MCP configuration exists at ~/.config/claude-code/mcp.json"
+    else
+        echo "✗ MCP configuration not found"
+    fi
+    echo ""
     echo "Aliases available after next login:"
     grep claudeca ~/.bashrc || echo "Alias not found"
 '
@@ -186,5 +272,12 @@ echo "2. Switch to michau user: sudo su - michau"
 echo "3. The claudeca alias will be available after sourcing .bashrc or logging in again"
 echo "4. Configure Claude Code with your API key if needed"
 echo "5. Test the setup: claudeca --help"
+echo "6. Test MCP servers: claudeca --list-tools (should show tools from MCP servers)"
+echo ""
+echo "MCP Servers installed:"
+echo "- Sequential Thinking: Enhanced reasoning capabilities"
+echo "- Playwright: Browser automation and web testing"
+echo "- Web Fetching: Advanced web content retrieval"
+echo "- Browser Tools: Browser interaction and automation"
 echo ""
 echo "SSH config backup saved at: /etc/ssh/sshd_config.backup.*"
