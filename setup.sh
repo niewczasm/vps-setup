@@ -164,7 +164,7 @@ log "Adding claudeca alias..."
 sudo -u michau bash -c '
     echo "" >> ~/.bashrc
     echo "# Claude Code alias" >> ~/.bashrc
-    echo "alias claudeca=\"claude --continue --dangerously-allow-everything\"" >> ~/.bashrc
+    echo "alias claudeca=\"claude --continue --dangerously-skip-permissions\"" >> ~/.bashrc
     echo "Alias added to .bashrc"
 '
 
