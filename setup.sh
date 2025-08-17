@@ -231,9 +231,8 @@ sudo -u michau bash -c '
     echo ""
     echo "MCP Servers verification:"
     echo "- Sequential Thinking: $(npm list -g @modelcontextprotocol/server-sequential-thinking 2>/dev/null | grep server-sequential-thinking || echo \"Not found\")"
-    echo "- Playwright: $(npm list -g @modelcontextprotocol/server-playwright 2>/dev/null | grep server-playwright || echo \"Not found\")"
-    echo "- Web Fetching: $(npm list -g @modelcontextprotocol/server-fetch 2>/dev/null | grep server-fetch || echo \"Not found\")"
-    echo "- Browser Tools: $(python3 -m pip show mcp-server-browser-tools 2>/dev/null | grep Name || echo \"Not found\")"
+    echo "- Playwright: $(npm list -g @playwright/mcp-server 2>/dev/null | grep server-playwright || echo \"Not found\")"
+    echo "- Web Fetching: $(npm list -g @kazuph/mcp-fetch 2>/dev/null | grep server-fetch || echo \"Not found\")"
     echo ""
     echo "MCP Config file:"
     if [ -f ~/.config/claude-code/mcp.json ]; then
