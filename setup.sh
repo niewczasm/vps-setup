@@ -113,8 +113,8 @@ sudo -u michau bash -c '
 # 8.1. Install MCP servers
 log "Installing MCP servers..."
 
-# Install Python and pip for Python-based MCP servers
-apt install -y python3 python3-pip python3-venv
+# Install Github app
+apt install -y gh
 
 # Install MCP servers as michau user
 sudo -u michau bash -c '
@@ -131,18 +131,11 @@ sudo -u michau bash -c '
     
     # Install Playwright MCP server (requires additional setup)
     log "Installing Playwright MCP server..."
-    npm install -g @modelcontextprotocol/server-playwright
-    
-    # Install Playwright browsers
-    npx playwright install
+    npm install -g @playwright/mcp-server
     
     # Install Web Fetching MCP server
     log "Installing Web Fetching MCP server..."
-    npm install -g @modelcontextprotocol/server-fetch
-    
-    # Install Browser Tools MCP server (Python-based)
-    log "Installing Browser Tools MCP server..."
-    python3 -m pip install --user mcp-server-browser-tools
+    npm install -g @kazuph/mcp-fetch
     
     echo "MCP servers installed successfully"
 '
@@ -161,15 +154,11 @@ sudo -u michau bash -c '
     },
     "playwright": {
       "command": "npx",
-      "args": ["@modelcontextprotocol/server-playwright"]
+      "args": ["@playwright/mcp-server"]
     },
     "fetch": {
       "command": "npx",
-      "args": ["@modelcontextprotocol/server-fetch"]
-    },
-    "browser-tools": {
-      "command": "python3",
-      "args": ["-m", "mcp_server_browser_tools"]
+      "args": ["@kazuph/mcp-fetch"]
     }
   }
 }
@@ -278,6 +267,5 @@ echo "MCP Servers installed:"
 echo "- Sequential Thinking: Enhanced reasoning capabilities"
 echo "- Playwright: Browser automation and web testing"
 echo "- Web Fetching: Advanced web content retrieval"
-echo "- Browser Tools: Browser interaction and automation"
 echo ""
 echo "SSH config backup saved at: /etc/ssh/sshd_config.backup.*"
