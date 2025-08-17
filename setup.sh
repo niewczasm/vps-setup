@@ -37,7 +37,7 @@ apt update && apt upgrade -y
 
 # Install essential packages
 log "Installing essential packages..."
-apt install -y curl wget git build-essential
+apt install -y gh
 
 # 2. Create user named michau
 log "Creating user 'michau'..."
@@ -129,20 +129,9 @@ sudo -u michau bash -c '
     log "Installing Sequential Thinking MCP server..."
     npm install -g @modelcontextprotocol/server-sequential-thinking
     
-    # Install Playwright MCP server (requires additional setup)
-    log "Installing Playwright MCP server..."
-    npm install -g @modelcontextprotocol/server-playwright
-    
-    # Install Playwright browsers
-    npx playwright install
-    
     # Install Web Fetching MCP server
     log "Installing Web Fetching MCP server..."
-    npm install -g @modelcontextprotocol/server-fetch
-    
-    # Install Browser Tools MCP server (Python-based)
-    log "Installing Browser Tools MCP server..."
-    python3 -m pip install --user mcp-server-browser-tools
+    npm install -g @kazuph/mcp-fetch
     
     echo "MCP servers installed successfully"
 '
@@ -159,17 +148,9 @@ sudo -u michau bash -c '
       "command": "npx",
       "args": ["@modelcontextprotocol/server-sequential-thinking"]
     },
-    "playwright": {
-      "command": "npx",
-      "args": ["@modelcontextprotocol/server-playwright"]
-    },
     "fetch": {
       "command": "npx",
-      "args": ["@modelcontextprotocol/server-fetch"]
-    },
-    "browser-tools": {
-      "command": "python3",
-      "args": ["-m", "mcp_server_browser_tools"]
+      "args": ["@kazuph/mcp-fetch"]
     }
   }
 }
@@ -242,9 +223,7 @@ sudo -u michau bash -c '
     echo ""
     echo "MCP Servers verification:"
     echo "- Sequential Thinking: $(npm list -g @modelcontextprotocol/server-sequential-thinking 2>/dev/null | grep server-sequential-thinking || echo \"Not found\")"
-    echo "- Playwright: $(npm list -g @modelcontextprotocol/server-playwright 2>/dev/null | grep server-playwright || echo \"Not found\")"
-    echo "- Web Fetching: $(npm list -g @modelcontextprotocol/server-fetch 2>/dev/null | grep server-fetch || echo \"Not found\")"
-    echo "- Browser Tools: $(python3 -m pip show mcp-server-browser-tools 2>/dev/null | grep Name || echo \"Not found\")"
+    echo "- Web Fetching: $(npm list -g @kazuph/mcp-fetch 2>/dev/null | grep server-fetch || echo \"Not found\")"
     echo ""
     echo "MCP Config file:"
     if [ -f ~/.config/claude-code/mcp.json ]; then
